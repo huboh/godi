@@ -9,36 +9,32 @@
 // Key features include:
 //   - Modular architecture with clear separation of concerns
 //   - Constructor-based and direct dependency injection
-//   - HTTP routing with middleware support via Guards
 //   - Flexible module configuration and composition
 //   - Type-safe dependency management
 //
-// # Dependency Injection
+// # Constructor-based Dependency Injection
 //
-// Godi supports two main ways of injecting dependencies:
+// Constructors are the building blocks of dependency injection in Godi. They are plain Go functions that:
+//   - Accept zero or more dependencies as parameters
+//   - Return one or more values of any type
+//   - Optionally return an error as the last return value
 //
-//  1. **Constructor-based Injection**:
+// Example of a constructor:
 //
-//     Constructors are the building blocks of dependency injection in Godi. They are plain Go functions that:
-//     - Accept zero or more dependencies as parameters
-//     - Return one or more values of any type
-//     - Optionally return an error as the last return value
+//	func NewUserService(dep1 *Dependency1, dep2 *Dependency2) (*UserService, error) {
+//		return &UserService{
+//			dep1: dep1,
+//			dep2: dep2,
+//		}, nil
+//	}
 //
-//     Example of a constructor:
+//	Any arguments that the constructor has are treated as its dependencies. The dependencies are instantiated
+//	in an unspecified order along with any dependencies that they might have, creating a dependency graph at runtime.
 //
-//     func NewUserService(dep1 *Dependency1, dep2 *Dependency2) (*UserService, error) {
-//     return &UserService{
-//     dep1: dep1,
-//     dep2: dep2,
-//     }, nil
-//     }
+// # Direct Dependency Injection
 //
-//     Any arguments that the constructor has are treated as its dependencies. The dependencies are instantiated
-//     in an unspecified order along with any dependencies that they might have, creating a dependency graph at runtime.
-//
-//  2. **Direct Injection**:
-//     If a dependency itself does not require any other dependencies, you can opt to inject it directly without using a constructor.
-//     This can be more convenient than defining a constructor, especially for simple dependencies.
+// If a dependency itself does not require any other dependencies, you can opt to inject it directly without using a constructor.
+// This can be more convenient than defining a constructor, especially for simple dependencies.
 //
 // # Modules
 //
@@ -138,39 +134,37 @@
 //	    return validated, nil
 //	}
 //
-// Guards can be applied at two different scopes:
+// **Controller-scoped Guards**:
 //
-//  1. **Controller-scoped Guards**:
+// Guards defined at the controller level will be applied to all routes within that controller.
+// This is useful for applying authorization to an entire controller.
 //
-//     Guards defined at the controller level will be applied to all routes within that controller.
-//     This is useful for applying authorization to an entire controller.
+//	func (c *AuthController) Config() *godi.ControllerConfig {
+//		return &godi.ControllerConfig{
+//			...
+//			Guards:      []godi.Guard{},            // Controller-wide guards
+//			GuardsCtors: []godi.GuardConstructor{}, // Controller-wide guards constructors
+//			RoutesCfgs:  []*godi.RouteConfig{...},
+//		}
+//	}
 //
-//     func (c *AuthController) Config() *godi.ControllerConfig {
-//     return &godi.ControllerConfig{
-//     ...
-//     Guards:      []godi.Guard{},            // Controller-wide guards
-//     GuardsCtors: []godi.GuardConstructor{}, // Controller-wide guards constructors
-//     RoutesCfgs:  []*godi.RouteConfig{...},
-//     }
-//     }
+// **Route-scoped Guards**:
 //
-//  2. **Route-scoped Guards**:
+// Guards can also be defined at the individual route level, allowing you to apply specific guard
+// to only a subset of a controllers routes.
 //
-//     Guards can also be defined at the individual route level, allowing you to apply specific guard
-//     to only a subset of a controllers routes.
-//
-//     func (c *AuthController) Config() *godi.ControllerConfig {
-//     return &godi.ControllerConfig{
-//     ...
-//     RoutesCfgs:  []*godi.RouteConfig{
-//     {
-//     ...
-//     Guards:      []godi.Guard{},            // Route guards
-//     GuardsCtors: []godi.GuardConstructor{}, // Route guards constructors
-//     },
-//     },
-//     }
-//     }
+//	func (c *AuthController) Config() *godi.ControllerConfig {
+//		return &godi.ControllerConfig{
+//			...
+//			RoutesCfgs:  []*godi.RouteConfig{
+//				{
+//					...
+//					Guards:      []godi.Guard{},            // Route guards
+//					GuardsCtors: []godi.GuardConstructor{}, // Route guards constructors
+//				},
+//			},
+//		}
+//	}
 //
 // # Structuring Modules
 //

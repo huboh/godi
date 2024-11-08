@@ -11,7 +11,7 @@
 
 ## Getting Started
 
-- Read the detailed documentation, please refer to the [Godi package documentation on pkg.go.dev](https://pkg.go.dev/github.com/huboh/godi#section-documentation).
+- Read the detailed documentation, please refer to the [Godi package documentation](https://pkg.go.dev/github.com/huboh/godi#section-documentation).
 - Add Godi to your project:
 
   ```bash
